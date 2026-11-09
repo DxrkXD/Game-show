@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Wants to Be an Email Expert?</title>
+<style>
+:root{--bg:#070b2a;--panel:#10185a;--gold:#ffc83d;--blue:#2347d8;--green:#1fb86a;--red:#e0364a;--text:#f2f4ff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at top,#1a2a8a 0,var(--bg) 65%) fixed;color:var(--text);font-family:"Trebuchet MS",system-ui,sans-serif}
+.spot{position:fixed;top:-20%;width:40vw;height:140vh;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 70%);filter:blur(30px);pointer-events:none;animation:sway 9s ease-in-out infinite alternate}
+.s1{left:5%;transform:rotate(18deg)}.s2{right:5%;transform:rotate(-18deg);animation-delay:-4s}
+@keyframes sway{to{transform:rotate(-6deg) translateX(40px)}}
+main{position:relative;max-width:1100px;margin:0 auto;padding:20px}
+.screen{display:none;text-align:center;animation:pop .4s}.screen.active{display:block}
+@keyframes pop{from{opacity:0;transform:scale(.96)}}
+.logo{font-size:64px;margin-top:20px}
+h1{font-size:clamp(30px,6vw,56px);margin:8px 0;line-height:1.1}h1 span{color:var(--gold);text-shadow:0 0 25px rgba(255,200,61,.5)}
+.sub{opacity:.8;max-width:520px;margin:10px auto 22px}
+input{font:inherit;font-size:18px;padding:14px 18px;border-radius:30px;border:2px solid var(--blue);background:var(--panel);color:#fff;width:min(320px,90%);text-align:center;outline:none}
+input:focus{border-color:var(--gold)}
+button{font:inherit;cursor:pointer;color:#fff}
+.big{display:block;margin:16px auto;background:linear-gradient(#ffd75e,#e49b0f);color:#2a1a00;font-weight:700;font-size:20px;border:0;padding:14px 34px;border-radius:40px;box-shadow:0 5px 0 #a06500,0 0 25px rgba(255,200,61,.35)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #a06500}
+.lb-box{background:rgba(16,24,90,.7);border:1px solid var(--blue);border-radius:16px;padding:12px 18px;max-width:420px;margin:24px auto}
+.lb-box h3{margin:0 0 6px;color:var(--gold)}
+.lb-box ol{margin:0;padding:0;list-style:none;text-align:left}
+.lb-box li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.lb-box li.me{color:var(--gold);font-weight:700}
+.mute{position:fixed;top:12px;right:12px;background:var(--panel);border:1px solid var(--blue);border-radius:50%;width:42px;height:42px;font-size:18px}
+.layout{display:grid;grid-template-columns:1fr 200px;gap:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lifelines{display:flex;gap:8px}
+.life{background:var(--panel);border:2px solid var(--gold);border-radius:50%;width:54px;height:54px;font-weight:700;font-size:15px}
+.life:disabled{opacity:.3;border-color:#888;text-decoration:line-through;cursor:not-allowed}
+.timer{position:relative;width:60px;height:60px}.timer svg{transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:4}.bg{stroke:rgba(255,255,255,.15)}
+.fg{stroke:var(--gold);stroke-dasharray:119.4;stroke-dashoffset:0;stroke-linecap:round;transition:stroke .3s}
+.timer.low .fg{stroke:var(--red)}.timer.low span{color:var(--red)}
+.timer span{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;font-weight:700}
+.walk{background:transparent;border:2px solid var(--green);border-radius:20px;padding:8px 12px;font-size:13px}
+.qnum{margin:18px 0 6px;color:var(--gold);font-weight:700;letter-spacing:1px}
+.question{background:linear-gradient(#18227a,#0c1450);border:2px solid var(--gold);border-radius:50px;padding:20px 28px;font-size:clamp(17px,3vw,24px);min-height:90px;display:grid;place-items:center;box-shadow:0 0 30px rgba(35,71,216,.5)}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.ans{display:flex;gap:10px;align-items:center;text-align:left;background:linear-gradient(#18227a,#0c1450);border:2px solid var(--blue);border-radius:40px;padding:14px 20px;font-size:16px;transition:.15s}
+.ans b{color:var(--gold)}
+.ans:hover:not(:disabled){border-color:var(--gold);transform:scale(1.02)}
+.ans.locked{background:#c77d0a;border-color:var(--gold);animation:pulse .5s infinite alternate}
+.ans.right{background:var(--green);border-color:#9fffcf;animation:none}
+.ans.wrong{background:var(--red);border-color:#ffb0b9;animation:none}
+.ans.gone{visibility:hidden}
+@keyframes pulse{to{filter:brightness(1.35)}}
+.audience{display:flex;gap:14px;justify-content:center;align-items:flex-end;height:110px;margin-top:16px}
+.bar{width:48px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:13px}
+.bar i{display:block;width:100%;background:var(--gold);border-radius:6px 6px 0 0;transition:height .8s}
+.why{margin-top:16px;background:rgba(255,255,255,.07);padding:12px 16px;border-radius:14px;text-align:left}
+.hidden{display:none!important}
+.ladder ol{list-style:none;margin:0;padding:10px;background:rgba(16,24,90,.7);border:1px solid var(--blue);border-radius:16px;display:flex;flex-direction:column-reverse;gap:3px}
+.ladder li{display:flex;justify-content:space-between;padding:5px 10px;border-radius:8px;font-size:14px;color:#9ab}
+.ladder li.safe{color:#fff}.ladder li.done{opacity:.45}
+.ladder li.now{background:var(--gold);color:#2a1a00;font-weight:700}
+#endScore{font-size:clamp(40px,9vw,72px);color:var(--gold);font-weight:700;text-shadow:0 0 25px rgba(255,200,61,.5)}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.ladder{display:none}.answers{grid-template-columns:1fr}.question{border-radius:28px;padding:16px}}
+
+</style>
+</head>
+<body>
+<div class="spot s1"></div><div class="spot s2"></div>
+<main>
+  <section id="start" class="screen active">
+    <div class="logo">✉️</div>
+    <h1>Who Wants to Be an<br><span>Email Expert?</span></h1>
+    <p class="sub">12 questions on email hardware &amp; servers. Three lifelines. Two safe havens. 30 seconds per question.</p>
+    <input id="name" maxlength="20" placeholder="Enter your name" autocomplete="off">
+    <button id="playBtn" class="big">Take the hot seat</button>
+    <div class="lb-box"><h3>Hall of Fame</h3><ol id="lbStart"></ol></div>
+    <button class="mute" id="mute" title="Sound on/off">🔊</button>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="layout">
+      <div class="stage">
+        <div class="topbar">
+          <div class="lifelines">
+            <button class="life" id="l-fifty" title="50:50">50:50</button>
+            <button class="life" id="l-audience" title="Ask the audience">👥</button>
+            <button class="life" id="l-skip" title="Swap the question">🔄</button>
+          </div>
+          <div class="timer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" class="bg"/><circle id="ring" cx="22" cy="22" r="19" class="fg"/></svg><span id="secs">30</span></div>
+          <button id="walk" class="walk">Take the money</button>
+        </div>
+        <div class="qnum" id="qnum"></div>
+        <div class="question" id="qtext"></div>
+        <div id="audience" class="audience hidden"></div>
+        <div class="answers" id="answers"></div>
+        <div class="why hidden" id="why"></div>
+        <button id="nextBtn" class="big hidden">Next question ▸</button>
+      </div>
+      <aside class="ladder"><ol id="ladder"></ol></aside>
+    </div>
+  </section>
+
+  <section id="end" class="screen">
+    <div class="logo" id="endIcon">🏆</div>
+    <h2 id="endTitle"></h2>
+    <div class="score" id="endScore"></div>
+    <p class="sub" id="endMsg"></p>
+    <div class="lb-box"><h3>Hall of Fame</h3><ol id="lbEnd"></ol></div>
+    <button id="again" class="big">Play again</button>
+  </section>
+</main>
+<script>
+// Question bank built from "Hardware used for Emails". First option is always the correct one;
+// the server shuffles options before sending, so answers never reach the browser until revealed.
+const BANK = {
+  easy: [
+    { q: "What does SMTP stand for?", o: ["Simple Mail Transfer Protocol", "Secure Message Transfer Panel", "Standard Mail Tracking Process", "Simple Message Template Protocol"], why: "SMTP = Simple Mail Transfer Protocol, the system that handles sending email." },
+    { q: "Which server handles OUTGOING email?", o: ["SMTP server", "IMAP server", "DNS server", "Wi-Fi router"], why: "The SMTP server takes your message and routes it across the internet." },
+    { q: "Emails work like a digital version of what?", o: ["The post office", "A telephone call", "A radio station", "A library"], why: "Email is a digital post office: messages are routed through mail servers until they reach an inbox." },
+    { q: "Where do you usually receive messages and updates from things you've signed up for?", o: ["Your inbox", "Your spam folder", "Your GPU", "Your modem"], why: "The inbox is the main place incoming messages arrive." },
+    { q: "Which folder can an email land in when it is automatically moved away from your inbox?", o: ["Spam", "Sent", "Drafts", "Outbox"], why: "Spam is where unwanted mail is automatically moved." },
+    { q: "Which devices turn physical touch into electric signals so you can type and press send?", o: ["Input devices (keyboard, mouse, touchscreen)", "The modem", "The SMTP server", "The display screen"], why: "Input devices convert your touch into electrical signals." },
+    { q: "What does the GPU do when you use an email client?", o: ["Renders the email interface on the monitor's pixels", "Looks up the recipient's address", "Stores your drafts", "Sends the email across the globe"], why: "The display screen and GPU let you read what you write." },
+    { q: "In the email journey, where does the very first step happen?", o: ["You write the email on your computer", "The email lands in a mailbox", "The DNS server looks up the address", "The recipient reads it"], why: "Step 1: you write the email on your computer." }
+  ],
+  medium: [
+    { q: "What does the DNS server act like in the email journey?", o: ["A digital phonebook", "A mirror", "A name tag", "A postage stamp"], why: "Your provider looks up the address in a digital phonebook (DNS) to find where to send it." },
+    { q: "IMAP acts like a what?", o: ["Mirror", "Megaphone", "Filing cabinet", "Postbox"], why: "IMAP mirrors your mailbox: read, delete or organise on one device and every device changes at the same time." },
+    { q: "What is IMAP mainly used for?", o: ["Keeping emails stored online so you can manage them from any device", "Sending emails out", "Translating signals for fibre cables", "Rendering the screen"], why: "IMAP is the incoming server that keeps mail on the internet instead of one device." },
+    { q: "A MAC address is like a what?", o: ["A name tag burnt into your network card", "A postcode for your house", "A password for your email", "A phone number for your router"], why: "It's a physical name tag set during manufacturing so only your chip accepts the packet." },
+    { q: "Which part wraps digital data into network packets and assigns a MAC address to outgoing data?", o: ["Network Interface Card (NIC / Wi-Fi chip)", "CPU", "RAM", "Display screen"], why: "The NIC prepares data for the network and tags it with your MAC address." },
+    { q: "Which component stores temporary application memory and caches your message drafts?", o: ["RAM & storage", "The modem", "The keyboard", "The router"], why: "RAM and storage (SSD/HDD) hold temporary memory and cached drafts." },
+    { q: "Which part formats your text and attachments into standard email data (SMTP)?", o: ["CPU (processor)", "GPU", "Antenna", "Mouse"], why: "The CPU formats your text and attachments into standard email data." },
+    { q: "When you hit send, your message is broken into what?", o: ["Data packets", "Paper letters", "Radio songs", "Pixels"], why: "Messages are split into data packets and routed through mail servers." }
+  ],
+  hard: [
+    { q: "What does the word 'modem' come from?", o: ["Modulator-demodulator", "Mobile-demand", "Mode-emitter", "Module-memory"], why: "A modem is a modulator-demodulator." },
+    { q: "What does a network modem convert digital signals into so they can leave your building?", o: ["Light signals (fibre optic) or analog signals", "Sound waves only", "Pixels", "Paper mail"], why: "It translates your network's digital signals so they can travel along your ISP's long-distance cables." },
+    { q: "How does an analog system represent data?", o: ["As a continuous, smooth wave of signal", "As 1s and 0s", "As data packets", "As MAC addresses"], why: "Analog = continuous smooth wave, not discrete binary numbers." },
+    { q: "What is a digital stream?", o: ["A continuous sequence of data delivered in real time and processed straight away", "A file that must fully download before playing", "A cable carrying only analog signals", "A type of email folder"], why: "Streams arrive as small sequential packets that your hardware decodes as they come in." },
+    { q: "How does a Wi-Fi antenna or Ethernet cable transmit data packets?", o: ["Radio frequencies (wireless) or electrical pulses through copper (Ethernet)", "Only as light pulses", "Only through satellites", "By printing them"], why: "Wireless uses radio frequencies; Ethernet uses electrical pulses through copper wiring." },
+    { q: "What does the Wi-Fi router / access point do with radio waves from your device?", o: ["Translates them back into digital data streams", "Stores them as drafts", "Turns them into spam", "Looks up the DNS record"], why: "It receives radio waves and translates them back into digital data." },
+    { q: "In the email journey, what happens right after your provider looks up the address in the DNS server?", o: ["The email travels across the internet globe", "The recipient reads it", "The email lands in the sender's drafts", "The phone downloads the message"], why: "Step 4 is the email travelling across the internet." },
+    { q: "What do 'protocols' mean when emails are routed through mail servers?", o: ["Standardised rules the servers follow", "Types of cables", "Spam filters", "Keyboard layouts"], why: "Protocols are standardised rules, such as SMTP, that mail servers follow." }
+  ]
+};
+
+/* ---------- in-browser game engine (replaces the Node backend so this works on static hosting) ---------- */
+const LADDER = [100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000], SAFE = [4,8], TIME_LIMIT = 30;
+const TIERS = ['easy','easy','easy','easy','medium','medium','medium','medium','hard','hard','hard','hard'];
+const rint = n => Math.floor(Math.random() * n);
+const shuffleArr = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rint(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let G = null, leaderboard = [];
+try { leaderboard = JSON.parse(localStorage.getItem('emailGameshowLB') || '[]'); } catch (e) { leaderboard = []; }
+const saveLB = () => { try { localStorage.setItem('emailGameshowLB', JSON.stringify(leaderboard)); } catch (e) {} };
+function draw(tier) {
+  const pool = BANK[tier].map((_, i) => i).filter(i => !G.used.has(tier + i));
+  const idx = pool[rint(pool.length)]; G.used.add(tier + idx);
+  const src = BANK[tier][idx], opts = shuffleArr(src.o.map((text, i) => ({ text, ok: i === 0 })));
+  return { tier, text: src.q, options: opts.map(o => o.text), correct: opts.findIndex(o => o.ok), why: src.why, issued: Date.now(), removed: [] };
+}
+const issue = () => { G.current = draw(TIERS[G.level]); };
+const publicQ = () => ({ number: G.level + 1, total: LADDER.length, prize: LADDER[G.level], text: G.current.text, options: G.current.options, removed: G.current.removed, timeLimit: TIME_LIMIT, lifelines: G.lifelines, tier: G.current.tier });
+const bankedFor = level => { let b = 0; for (const s of SAFE) if (level > s) b = LADDER[s]; return b; };
+function finish(score, reason) {
+  G.over = true;
+  const entry = { name: G.name, score, reason, date: new Date().toISOString() };
+  leaderboard.push(entry); leaderboard.sort((a, b) => b.score - a.score || a.date.localeCompare(b.date));
+  const rank = leaderboard.indexOf(entry) + 1; leaderboard = leaderboard.slice(0, 50); saveLB();
+  return { over: true, score, reason, rank };
+}
+const routes = {
+  start: b => {
+    const name = String(b.name || 'Contestant').trim().slice(0, 20) || 'Contestant';
+    G = { name, level: 0, used: new Set(), lifelines: { fifty: true, audience: true, skip: true }, over: false };
+    issue(); return { sessionId: 'local', name, ladder: LADDER, safe: SAFE, question: publicQ() };
+  },
+  answer: b => {
+    const q = G.current, late = (Date.now() - q.issued) / 1000 > TIME_LIMIT + 3;
+    const choice = Number.isInteger(b.choice) ? b.choice : -1;
+    const correct = !late && choice === q.correct && !q.removed.includes(choice);
+    const base = { correct, correctIndex: q.correct, why: q.why, timedOut: late || choice < 0 };
+    if (correct) {
+      const won = LADDER[G.level];
+      if (G.level === LADDER.length - 1) return { ...base, ...finish(won, 'won') };
+      G.level++; issue(); return { ...base, over: false, winnings: won, next: publicQ() };
+    }
+    return { ...base, ...finish(bankedFor(G.level), base.timedOut ? 'timeout' : 'wrong') };
+  },
+  walk: () => ({ correctIndex: G.current.correct, ...finish(G.level > 0 ? LADDER[G.level - 1] : 0, 'walked') }),
+  lifeline: b => {
+    const q = G.current, type = b.type; G.lifelines[type] = false;
+    if (type === 'fifty') { q.removed = shuffleArr([0,1,2,3].filter(i => i !== q.correct)).slice(0, 2); return { type, removed: q.removed }; }
+    if (type === 'audience') {
+      const strength = { easy: 70, medium: 55, hard: 40 }[q.tier] + rint(15), pct = [0,0,0,0]; let left = 100 - strength; pct[q.correct] = strength;
+      const others = [0,1,2,3].filter(i => i !== q.correct && !q.removed.includes(i));
+      others.forEach((i, n) => { const s = n === others.length - 1 ? left : rint(left + 1); pct[i] = s; left -= s; });
+      return { type, percentages: pct };
+    }
+    issue(); return { type, question: publicQ() };
+  },
+  leaderboard: () => ({ leaderboard: leaderboard.slice(0, 10) })
+};
+
+const $ = id => document.getElementById(id);
+const money = n => '$' + n.toLocaleString();
+let S = { id: null, name: '', ladder: [], safe: [], q: null, timer: null, locked: false, deadline: 0, muted: false };
+
+/* ---------- sound (WebAudio, no files needed) ---------- */
+let ac;
+function tone(freq, dur = .2, type = 'sine', vol = .15, when = 0) {
+  if (S.muted) return;
+  ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + when;
+  o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur);
+}
+const sfx = {
+  lock: () => { tone(220, .3, 'triangle'); tone(165, .4, 'triangle', .12, .15); },
+  right: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .25, 'square', .1, i * .12)),
+  wrong: () => { tone(160, .5, 'sawtooth', .15); tone(110, .8, 'sawtooth', .15, .3); },
+  tick: () => tone(880, .05, 'square', .05),
+  life: () => { tone(600, .1); tone(900, .15, 'sine', .12, .1); },
+  win: () => [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, .3, 'square', .1, i * .15))
+};
+$('mute').onclick = () => { S.muted = !S.muted; $('mute').textContent = S.muted ? '🔇' : '🔊'; };
+
+/* ---------- api ---------- */
+async function api(path, body) { return routes[path](body || {}); }
+const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); };
+
+async function loadLB(el, me) {
+  const { leaderboard } = await api('leaderboard');
+  el.innerHTML = leaderboard.length ? '' : '<li>No contestants yet. Be the first!</li>';
+  leaderboard.forEach((e, i) => {
+    const li = document.createElement('li'); if (me && e.date === me) li.className = 'me';
+    li.innerHTML = `<span>${i + 1}. </span><span></span><span>${money(e.score)}</span>`;
+    li.children[1].textContent = e.name; li.children[1].style.flex = 1; li.children[1].style.marginLeft = '8px';
+    el.appendChild(li);
+  });
+}
+
+/* ---------- game flow ---------- */
+async function start() {
+  const d = await api('start', { name: $('name').value });
+  S = { ...S, id: d.sessionId, name: d.name, ladder: d.ladder, safe: d.safe };
+  show('game'); renderLadder(0); setQuestion(d.question); resetLifelines();
+}
+function resetLifelines() { ['fifty', 'audience', 'skip'].forEach(k => $('l-' + k).disabled = false); }
+
+function renderLadder(level) {
+  $('ladder').innerHTML = S.ladder.map((p, i) => `<li class="${S.safe.includes(i) ? 'safe' : ''} ${i < level ? 'done' : ''} ${i === level ? 'now' : ''}"><span>${i + 1}</span><span>${money(p)}</span></li>`).join('');
+}
+
+function setQuestion(q) {
+  S.q = q; S.locked = false;
+  $('qnum').textContent = `QUESTION ${q.number} OF ${q.total} · ${money(q.prize)}`;
+  $('qtext').textContent = q.text;
+  $('audience').classList.add('hidden'); $('why').classList.add('hidden'); $('nextBtn').classList.add('hidden');
+  $('walk').disabled = false;
+  const box = $('answers'); box.innerHTML = '';
+  q.options.forEach((t, i) => {
+    const b = document.createElement('button'); b.className = 'ans' + (q.removed.includes(i) ? ' gone' : '');
+    b.innerHTML = `<b>${'ABCD'[i]}:</b> <span></span>`; b.lastChild.textContent = t;
+    b.onclick = () => lockIn(i); box.appendChild(b);
+  });
+  startTimer(q.timeLimit);
+}
+
+function startTimer(limit) {
+  clearInterval(S.timer); S.deadline = Date.now() + limit * 1000; let lastSec = limit;
+  const tick = () => {
+    const left = Math.max(0, (S.deadline - Date.now()) / 1000), sec = Math.ceil(left);
+    $('secs').textContent = sec; $('ring').style.strokeDashoffset = 119.4 * (1 - left / limit);
+    $('ring').parentNode.parentNode.classList.toggle('low', sec <= 10);
+    if (sec !== lastSec && sec <= 10 && sec > 0) sfx.tick(); lastSec = sec;
+    if (left <= 0) { clearInterval(S.timer); if (!S.locked) submit(-1); }
+  };
+  tick(); S.timer = setInterval(tick, 200);
+}
+
+function lockIn(i) {
+  if (S.locked) return; S.locked = true; clearInterval(S.timer); sfx.lock();
+  document.querySelectorAll('.ans')[i].classList.add('locked'); $('walk').disabled = true;
+  setTimeout(() => submit(i), 1500); // suspense!
+}
+
+async function submit(choice) {
+  S.locked = true; clearInterval(S.timer);
+  const r = await api('answer', { sessionId: S.id, choice });
+  const btns = document.querySelectorAll('.ans');
+  btns.forEach(b => b.classList.remove('locked'));
+  btns[r.correctIndex].classList.add('right');
+  if (r.correct) { sfx.right(); } else { if (choice >= 0) btns[choice].classList.add('wrong'); sfx.wrong(); }
+  $('why').textContent = (r.timedOut && !r.correct ? "Time's up! " : '') + r.why; $('why').classList.remove('hidden');
+  const btn = $('nextBtn');
+  if (r.correct && !r.over) {
+    btn.textContent = 'Next question ▸'; btn.classList.remove('hidden');
+    btn.onclick = () => { renderLadder(r.next.number - 1); setQuestion(r.next); };
+  } else {
+    btn.textContent = 'See results ▸'; btn.classList.remove('hidden'); btn.onclick = () => end(r);
+  }
+}
+
+async function end(r) {
+  show('end');
+  const win = r.reason === 'won', walked = r.reason === 'walked';
+  $('endIcon').textContent = win ? '🏆' : walked ? '💰' : r.score > 0 ? '👏' : '😅';
+  $('endTitle').textContent = win ? 'MAXIMUM PRIZE! You are an Email Expert!' : walked ? 'You took the money!' : r.reason === 'timeout' ? "Time's up!" : 'Wrong answer!';
+  $('endScore').textContent = money(r.score);
+  $('endMsg').textContent = `${S.name}, you finished at rank #${r.rank} on the leaderboard.`;
+  win ? sfx.win() : r.score ? sfx.right() : sfx.wrong();
+  const me = (await api('leaderboard')).leaderboard; // refresh
+  loadLB($('lbEnd'));
+}
+
+/* ---------- lifelines & walk away ---------- */
+async function lifeline(type) {
+  if (S.locked) return; $(`l-${type}`).disabled = true; sfx.life();
+  const r = await api('lifeline', { sessionId: S.id, type });
+  if (type === 'fifty') r.removed.forEach(i => document.querySelectorAll('.ans')[i].classList.add('gone'));
+  if (type === 'audience') {
+    const a = $('audience'); a.classList.remove('hidden');
+    a.innerHTML = r.percentages.map((p, i) => `<div class="bar"><span>${p}%</span><i style="height:0" data-h="${p}"></i><b>${'ABCD'[i]}</b></div>`).join('');
+    setTimeout(() => a.querySelectorAll('i').forEach(el => el.style.height = el.dataset.h * .7 + 'px'), 50);
+  }
+  if (type === 'skip') setQuestion(r.question);
+}
+['fifty', 'audience', 'skip'].forEach(k => $('l-' + k).onclick = () => lifeline(k));
+$('walk').onclick = async () => {
+  if (S.locked || !confirm('Take the money and leave the game?')) return;
+  S.locked = true; clearInterval(S.timer); end(await api('walk', { sessionId: S.id }));
+};
+
+$('playBtn').onclick = start;
+$('name').onkeydown = e => { if (e.key === 'Enter') start(); };
+$('again').onclick = () => { show('start'); loadLB($('lbStart')); };
+loadLB($('lbStart'));
+
+</script>
+</body>
+</html>
